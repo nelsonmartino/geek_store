@@ -7,10 +7,19 @@ import {
   Body,
   Put,
   Delete,
+  HttpStatus,
+  HttpCode,
+  Res, //Para manejar errores con el motor de Express (ver video 13 del curso para completar)
 } from '@nestjs/common';
+
+import { Response } from 'express'; //Para manejar errores con el motor de Express (ver video 13 del curso para completar)
+
+import { ProductsService } from '../services/products.service';
 
 @Controller('products')
 export class ProductsController {
+  constructor(private productsService: ProductsService) {}
+
   //*Recibiendo información por params
   // @Get('products/:id') // sin importar las /, puedo acceder a esta nueva ruta como http://localhost:3000/otra_ruta
   // getProduct(@Param() params:any): string {
@@ -19,34 +28,39 @@ export class ProductsController {
 
   //*Recibiendo parámetros por query
   @Get()
-  getProducts(@Query() values: any): string {
-    const { limit, offset } = values;
-    return `Pagination limit:${limit} and offset:${offset}`;
+  getProducts(@Query() values: any) {
+    // const { limit, offset } = values;
+    return this.productsService.findAll();
+    // return `Pagination limit:${limit} and offset:${offset}`;
   }
 
-  //*Puedo recibir por query especificando los parámetros a recibir
-  @Get('2')
-  getProducts2(
-    @Query('limit') limit: number = 100, //*De esta manera puedo asignar un valor por defecto en caso de no recibirlo. En este caso "number" no es necesario
-    @Query('offset') offset: number,
-    @Query('brand') brand: number,
-  ): string {
-    return `Pagination limit:${limit}, offset:${offset} and brand:${brand}`;
-  }
+  // //*Puedo recibir por query especificando los parámetros a recibir
+  // @Get('2')
+  // getProducts2(
+  //   @Query('limit') limit: number = 100, //*De esta manera puedo asignar un valor por defecto en caso de no recibirlo. En este caso "number" no es necesario
+  //   @Query('offset') offset: number,
+  //   @Query('brand') brand: number,
+  // ) {
+  //   // return `Pagination limit:${limit}, offset:${offset} and brand:${brand}`;
+  //   return this.productsService.findAll();
+  // }
 
   //*Simplificando la recepción de parametros y especificando el parátro a recibir
   @Get(':id')
-  getProduct(@Param('id') id: string): string {
-    return `Product ${id}`;
+  // @HttpCode(HttpStatus.ACCEPTED) //Con esto defino el estado con el que quiero responder
+  getProduct(@Param('id') id: string) {
+    // return `Product ${id}`;
+    return this.productsService.findOne(+id);
   }
 
   // *Metodo post (crear)
   @Post()
   create(@Body() payload: any) {
-    return {
-      message: 'Create action',
-      payload,
-    };
+    // return {
+    //   message: 'Create action',
+    //   payload,
+    // };
+    return this.productsService.create(payload);
   }
 
   //*Tambien puedo especificar qué parámetros recibir y con qué formato
@@ -60,17 +74,18 @@ export class ProductsController {
   // }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() payload: any) {
-    return {
-      id,
-      payload,
-    };
+  update(@Param('id') id: string, @Body() payload: any) {
+    // return {
+    //   id,
+    //   payload,
+    // };
+    return this.productsService.update(+id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return id;
+  delete(@Param('id') id: string) {
+    return this.productsService.delete(+id);
   }
 }
 
-//! Codigos de estado
+//! Manejo de errores
