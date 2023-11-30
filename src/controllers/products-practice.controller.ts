@@ -15,7 +15,7 @@ import {
 
 import { Response } from 'express'; //Para manejar errores con el motor de Express (ver video 13 del curso para completar)
 
-import { ParseIntPipe } from '../common/parse-int/parse-int.pipe'; //En lugar de usar el que viene por defecto creo una para practicar
+import { ParseIntPipe } from '../common/parse-int.pipe'; //En lugar de usar el que viene por defecto creo una para practicar
 
 import { ProductsService } from '../services/products.service';
 
